@@ -1,0 +1,3 @@
+service ShamirShared("shamirShared"):
+  generate(priv_key: string) -> []string
+  openWallet(shares: []string) -> string

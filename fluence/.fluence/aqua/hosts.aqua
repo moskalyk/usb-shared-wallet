@@ -1,0 +1,33 @@
+aqua Hosts declares *
+
+data SpellLocation:
+    hostId: string
+    spellId: string
+    workerId: string
+
+data Host:
+    definition: string
+    installationSpells: []SpellLocation
+    timestamp: string
+    relayId: string
+    dummyDealId: string
+
+data Hosts:
+    defaultWorker: ?Host
+
+func get() -> Hosts:
+    <- Hosts(
+        defaultWorker=?[Host(
+            definition="bafkreietlro65jn5ibhkptrga2qlkxxhcrvy44tu2iysf2ftwqc6xu3chm",
+            installationSpells=[
+                SpellLocation(
+                    hostId="12D3KooWR5g7X5twdqfBhMFTVJ2PG6k9zCqfri8kXNMZMzD8x8av",
+                    spellId="1e1e7eb7-f6d3-4809-b0ff-d82e07aba860",
+                    workerId="12D3KooWBiB5RuEc3FgJtCpS4RkiPzVU79HGnrpF8gnea1cfshGV"
+                )
+            ],
+            timestamp="2024-02-08T02:01:08.521Z",
+            relayId="12D3KooWR5g7X5twdqfBhMFTVJ2PG6k9zCqfri8kXNMZMzD8x8av",
+            dummyDealId="defaultWorker_12D3KooWKa3zzPDmbFnA7LAzrD68P3P9mgFjX4Xua7UeiiAbKudb_20819847233384992"
+        )]
+    )

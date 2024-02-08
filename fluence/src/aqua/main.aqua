@@ -1,0 +1,67 @@
+aqua Main
+
+import "@fluencelabs/aqua-lib/builtin.aqua"
+import "@fluencelabs/aqua-lib/subnet.aqua"
+
+import SpellLocation from "hosts.aqua"
+
+use "deals.aqua"
+use "hosts.aqua"
+import "services.aqua"
+
+-- IMPORTANT: Add exports for all functions that you want to run
+export helloWorld, openWallet, genWallet, ShamirService, retrieveShares, serveDirectory
+
+data File:
+    name: string
+    path: string
+
+service ShamirService("shamirService"):
+    retrieveShare() -> string
+
+func getWorkerInfo() -> []SpellLocation:
+    hosts <- Hosts.get()  
+    <- hosts.defaultWorker!.installationSpells
+
+service FileService("fileService"):
+    serve() -> []File
+    connect(blob: []i32) -> bool
+
+func serveDirectory(peer: PeerId, relay_id: PeerId) -> File:
+    on peer via relay_id:
+        res <- FileService.serve()
+    <- res[0]
+
+func retrieveShares(peers: []PeerId, relay_id: PeerId) -> []string:
+    shares:  *string
+    on peers[0] via relay_id:
+        shares <- ShamirService.retrieveShare()
+    <- shares
+
+func noop(share: string) -> string:
+    <- share
+
+func openWallet(peers: []PeerId, relay_id: PeerId) -> []string:
+    workers <- getWorkerInfo()
+    receipt:  *string
+    shares:  *string
+
+    for peer <- peers:
+        share = serveDirectory(peer, relay_id)
+        shares <- noop(share.path)
+
+    for w <- workers:
+        on w.workerId via w.hostId:
+            receipt <- ShamirShared.openWallet(shares)
+    <- shares
+
+func genWallet(priv_key: string) -> *[]string:
+    workers <- getWorkerInfo()
+    receipt:  *[]string
+    for w <- workers:
+        on w.workerId via w.hostId:
+            receipt <- ShamirShared.generate(priv_key)
+    <- receipt
+
+func helloWorld(name: string) -> string:
+    <- Op.concat_strings("Hello, ", name)
